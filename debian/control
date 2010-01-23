@@ -1,0 +1,21 @@
+Source: xf86-input-evtouch
+Section: x11
+Priority: optional
+Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
+Uploaders: Mattia Dongili <malattia@debian.org>
+Build-Depends: debhelper (>= 5), pkg-config, xserver-xorg-dev (>= 2:1.4), x11proto-randr-dev, libxrender-dev, libx11-dev, quilt
+Standards-Version: 3.7.3
+Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evtouch
+Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evtouch.git
+Homepage: http://stz-softwaretechnik.com/~ke/touchscreen/evtouch.html
+
+Package: xserver-xorg-input-evtouch
+Architecture: any
+Depends: ${shlibs:Depends}, ${xserver:Depends}
+Provides: ${xinpdriver:Provides}
+Description: Touchscreen-Driver for X.Org/XFree86 server
+ This XFree/X.Org driver provides support for touchscreens input devices.
+ The driver is actually an evdev-driver which supports events for moving
+ in absolute coordinates, relative coordinates and mouse-buttons.
+ .
+

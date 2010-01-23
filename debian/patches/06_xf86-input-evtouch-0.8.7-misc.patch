@@ -1,0 +1,102 @@
+#
+# This patch is from http://www.postnuklear.de/xorg-patches/
+#
+# Description: This is a patch for the evtouch input driver (
+#              http://stz-softwaretechnik.com/~ke/touchscreen/evtouch.html).
+# Changes (for full description see ChangeLog file after patching (-: ):
+#   o Changed code to compile a working driver for both XInput ABI 0.x and 2.0 (Xorg 1.4.0)
+#   o changed rotation (due to segfault on xorg + fbdev)
+#   o drag support
+#   o tap "tolerance"
+#   o added generic ts-adc touchscreen device to udev rules file
+#
+# Feel free to send comments, critics, suggestions to harryrat@postnuklear.de
+# To apply simply change into the toplevel directory of the source to be modified and enter:
+# patch -p1 < <PATH_TO_PATCH>
+# 
+# All patches are available under the GNU GPL, I hope they might be useful for you (-:
+# - Harald Radke  
+#
+Index: xserver-xorg-input-evtouch/69-touchscreen.rules
+===================================================================
+--- xserver-xorg-input-evtouch.orig/69-touchscreen.rules	2008-02-02 21:49:20.783972805 +0900
++++ xserver-xorg-input-evtouch/69-touchscreen.rules	2008-02-02 21:49:39.730979724 +0900
+@@ -7,8 +7,11 @@
+ # Name can be found in /proc/bus/input/devices ('cat /proc/bus/input/devices')
+ #
+ 
+-# These are the touchscreens supported by kernel's "usbtouchscreen" module
++# Generic ts-adc touchscreen modules
++KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="ts-adc", SYMLINK+="input/evtouch_event"
++
+ 
++# These are the touchscreens supported by kernel's "usbtouchscreen" module
+ # eGalax Inc. USB TouchController)
+ KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="3823", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+ # eGalax Inc. USB TouchController)
+Index: xserver-xorg-input-evtouch/ChangeLog
+===================================================================
+--- xserver-xorg-input-evtouch.orig/ChangeLog	2008-02-02 21:49:20.795972782 +0900
++++ xserver-xorg-input-evtouch/ChangeLog	2008-02-02 21:49:39.730979724 +0900
+@@ -1,3 +1,61 @@
++0.8.7-HR *** Note this is not an official release but an "unauthorized
++	 *** fix version by me (Harald Radke - harryrat@postnuklear.de)
++	-> Changed code to compile a working driver for  both 
++	  XInput ABI 0.x and 2.0 (Xorg 1.4.0)
++	  (test compile for 0.x still needs to be done)
++	  - evtouch.c: 
++            * capsulated xf86Post*Events and xf86InputSetScreen 
++	      in functions where depending on the XINPUT ABI conversion
++	      is done or xf86 functions are directly called
++	    * xf86InitValuatorAxisStruct and xf86AlwaysCore() depending
++	      on ABI done
++	  - libtouch.h: passing xf86PostButtonEvent capsulation function
++	    to init function (same as in evtouch.c) to do proper button
++	    triggering
++	-> Rotation:
++	  - added support for Option "Rotate" "UD" (upside down) 
++	     in evtouch input section of xorg.conf
++	  - due to Segfault with (at least) fbdev video device, only
++	    evtouch "Rotate" option is taken into calculations for coords,
++	    meaning to get proper touchscreen behaviour on rotated X screens.
++	    same Rotate option as in video device section of xorg.conf has
++            to be set in the evtouch section
++	-> Drag support:
++	  Option "<STATE>_drag" "<BUTTON_ID>" has been added. When set,
++	  the handle_<STATE>() function triggers BUTTON_DOWN for Button <BUTTON_ID>
++	  before changing into S_MOVE state. Note that actually only
++	  Option "touched_drag" "<BUTTON_ID>" is implemented, rest is dummy
++	  (and doesn't make too much sense I guess) (-;
++	-> tap "tolerance":
++	   introduce move_limit to evtouch.c as it is in libtouch.c, using it
++	   to discard ABS_X/Y position changes if they are inside move_limit
++	   around cur_x/y. this way pointer hopping can be avoided as well as
++           proper touched_drag established
++         - changes of cur_x/y are reported on EV_SYN in evtouch.c ReadInput() instead
++           on EV_ABS
++	-> added generic ts-adc touchscreen device to udev rules file	   
++
++	=>  Example for a Loox720 PDA setup in input section of xorg.conf:
++		Section "InputDevice"
++		 Identifier "touchscreen"
++		 Driver "evtouch"
++		 Option "Device" "/dev/input/evtouch_event"
++		 Option "MinX" "434"
++		 Option "MinY" "333"
++		 Option "MaxX" "3643"
++		 Option "MaxY" "3804"
++		 Option "SwapX" "true"
++		 Option "longtouched_action" "down"
++		 Option "longtouched_button" "3"
++		 Option "maybetapped_action" "click"
++		 Option "maybetapped_button" "1"
++		 Option "touched_drag" "1"
++		 Option "oneandahalftap_button" "0"
++		 Option "TapTimer" "30"
++		 Option "LongtouchTimer"  "500"
++		 Option "MoveLimit"  "18"
++		EndSection
++
+ 0.8.7
+ 	- Added Elo Touchscreen to udev-rules (Stephen Webb)
+ 	- Added "fix" for AMD64-crashes on touch (Martin Letenay)
