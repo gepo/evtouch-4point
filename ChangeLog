@@ -1,0 +1,130 @@
+0.8.7-HR *** Note this is not an official release but an "unauthorized
+	 *** fix version by me (Harald Radke - harryrat@postnuklear.de)
+	-> Changed code to compile a working driver for  both 
+	  XInput ABI 0.x and 2.0 (Xorg 1.4.0)
+	  (test compile for 0.x still needs to be done)
+	  - evtouch.c: 
+            * capsulated xf86Post*Events and xf86InputSetScreen 
+	      in functions where depending on the XINPUT ABI conversion
+	      is done or xf86 functions are directly called
+	    * xf86InitValuatorAxisStruct and xf86AlwaysCore() depending
+	      on ABI done
+	  - libtouch.h: passing xf86PostButtonEvent capsulation function
+	    to init function (same as in evtouch.c) to do proper button
+	    triggering
+	-> Rotation:
+	  - added support for Option "Rotate" "UD" (upside down) 
+	     in evtouch input section of xorg.conf
+	  - due to Segfault with (at least) fbdev video device, only
+	    evtouch "Rotate" option is taken into calculations for coords,
+	    meaning to get proper touchscreen behaviour on rotated X screens.
+	    same Rotate option as in video device section of xorg.conf has
+            to be set in the evtouch section
+	-> Drag support:
+	  Option "<STATE>_drag" "<BUTTON_ID>" has been added. When set,
+	  the handle_<STATE>() function triggers BUTTON_DOWN for Button <BUTTON_ID>
+	  before changing into S_MOVE state. Note that actually only
+	  Option "touched_drag" "<BUTTON_ID>" is implemented, rest is dummy
+	  (and doesn't make too much sense I guess) (-;
+	-> tap "tolerance":
+	   introduce move_limit to evtouch.c as it is in libtouch.c, using it
+	   to discard ABS_X/Y position changes if they are inside move_limit
+	   around cur_x/y. this way pointer hopping can be avoided as well as
+           proper touched_drag established
+         - changes of cur_x/y are reported on EV_SYN in evtouch.c ReadInput() instead
+           on EV_ABS
+	-> added generic ts-adc touchscreen device to udev rules file	   
+
+	=>  Example for a Loox720 PDA setup in input section of xorg.conf:
+		Section "InputDevice"
+		 Identifier "touchscreen"
+		 Driver "evtouch"
+		 Option "Device" "/dev/input/evtouch_event"
+		 Option "MinX" "434"
+		 Option "MinY" "333"
+		 Option "MaxX" "3643"
+		 Option "MaxY" "3804"
+		 Option "SwapX" "true"
+		 Option "longtouched_action" "down"
+		 Option "longtouched_button" "3"
+		 Option "maybetapped_action" "click"
+		 Option "maybetapped_button" "1"
+		 Option "touched_drag" "1"
+		 Option "oneandahalftap_button" "0"
+		 Option "TapTimer" "30"
+		 Option "LongtouchTimer"  "500"
+		 Option "MoveLimit"  "18"
+		EndSection
+
+0.8.7
+	- Added Elo Touchscreen to udev-rules (Stephen Webb)
+	- Added "fix" for AMD64-crashes on touch (Martin Letenay)
+	- Fixed driver-behavior when resolution is changed using xrandr
+	  (Yura Semashko)
+	- Added stuff for installing udev-rules to /etc/... (Tuuka
+	  Pasanen)
+	- Added workaround for kernel-driver reporting ABS_Z and ABS_RX
+	  instead of ABS_X and ABS_Y (Lutz Sammer + me)
+
+0.8.6
+	- replaced old udev-rules with a more complete one (Thomas Bartosik)
+	- Added Lifebook B-series to udev-rules
+	- Fixed classic rotation (again)
+	- Fixed wrong handling of wrong / fixed default screen size
+	- little code-cleanup (removed obsolete variables)
+	- Fixed segv when switching to VT (Mattia Dongili)
+
+0.8.5
+	- Made Events in libtouch configurable (experimental)
+	- Changed initialization for Xorg 7.2
+
+0.8.4
+	- Added XRandr-support (Mattia Dongili)
+	- Fixed Error in calibrate.sh
+	- Minor Compile-Warning fixes (Tuukka Pasanen)
+	- Make CURSORDIR work again (Tuukka Pasanen)
+	- added udev-rules for touchscreen device detection (Tuuka
+	  Pasanen)
+	- Button-press / -release now are alway issued on EV_SYN (me)
+
+0.8.3:
+	- removed useless trigger_sm
+	- fixed Middle-Button-Handling again
+
+0.8.2:
+	- Autotools-Improvements by Mattia Dongili
+	- pen-touch logic is used from libtouch now
+	- Minor improvements for libtouch (for handling evtouch)
+	- Middle button and Scrollwheel-Support (by Anthony Liguori)
+
+0.8.1:
+	- Applied autotools-patch from Tuukka Pasanen
+
+0.8:
+	- Imake-Cleanup
+	- Switched default-Y-direction (SDL + GPM compatibility)
+	- Implementation of Statemachine for the pen
+	  - Configuration changed (see Website for Details)
+	  - Behaviour for the pen has changed
+
+0.6.1:
+	- Added support for swapping y-axis
+	- Added support for swapping x-axis
+	- Added some missing files for calibration 
+	  (forgot to add them to the tarball)
+	- Fixed bug/typo in CW-rotation 
+
+	(Thanks to Jasun Wurster who
+	provided useful input and testing on the M150 and M170
+	touchsreens for the 0.6.1 release)
+
+0.6:
+	- Added support for screen-rotation (Thanks to Kevin Quigley
+	for some very useful input) 
+	- Added support for calibration
+
+0.5.1:
+	- Added support for emulate3Buttons
+
+0.5: 
+	- Initial Release

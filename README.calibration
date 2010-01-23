@@ -1,0 +1,8 @@
+Run ./calibrator <input device> as root and click on all rounds.
+
+After you have clicked on the last the calibration program
+writes to the output calibration parameters wich have to be merged into "XF86Config-4". 
+Open /etc/X11/xorg.conf and merge these lines into the "InputDevice"-section of your
+touchscreen.
+
+That's it.

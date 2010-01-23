@@ -1,0 +1,52 @@
+# Evtouch udev.rules
+#
+# Because Evtouch can't autoprobe devices we assume that we only
+# Have one device so we can make it like this :P
+#
+# List here your touchscreen, check if it works  and send it to lifebook_AT_conan_DOT_de
+# Name can be found in /proc/bus/input/devices ('cat /proc/bus/input/devices')
+#
+
+# Generic ts-adc touchscreen modules
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="ts-adc", SYMLINK+="input/evtouch_event"
+
+
+# These are the touchscreens supported by kernel's "usbtouchscreen" module
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="3823", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="3823", ATTRS{idProduct}=="0002", SYMLINK+="input/evtouch_event"
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0123", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0123", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0eef", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0eef", ATTRS{idProduct}=="0002", SYMLINK+="input/evtouch_event"
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# eGalax Inc. USB TouchController)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="0002", SYMLINK+="input/evtouch_event"
+# eTurboTouch
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="5678", SYMLINK+="input/evtouch_event"
+# PanJit Touchset
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="134C", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# PanJit Touchset
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="134C", ATTRS{idProduct}=="0002", SYMLINK+="input/evtouch_event"
+# PanJit Touchset
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="134C", ATTRS{idProduct}=="0003", SYMLINK+="input/evtouch_event"
+# PanJit Touchset
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="134C", ATTRS{idProduct}=="0004", SYMLINK+="input/evtouch_event"
+# 3M Microtouch EX II
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0596", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# ITM Touchscreens
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="F9E9", SYMLINK+="input/evtouch_event"
+# Gunze AHL61
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0637", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
+# DMC TSC-10/25
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0AFA", ATTRS{idProduct}=="03E8", SYMLINK+="input/evtouch_event"
+# Lifebook B-Series
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="LBPS/2 Fujitsu Lifebook TouchScreen", SYMLINK+="input/evtouch_event"
+# Elo Touchscreen
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="04e7", ATTRS{idProduct}=="0020", SYMLINK+="input/evtouch_event"
