@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
 Uploaders: Mattia Dongili <malattia@debian.org>
-Build-Depends: debhelper (>= 5), pkg-config, xserver-xorg-dev (>= 2:1.4), x11proto-randr-dev, libxrender-dev, libx11-dev, quilt
+Build-Depends: debhelper (>= 5), pkg-config, xserver-xorg-dev (>= 2:1.4), x11proto-randr-dev, libxrender-dev, libx11-dev, quilt, xutils-dev (>= 1:7.4)
 Standards-Version: 3.7.3
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evtouch
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evtouch.git

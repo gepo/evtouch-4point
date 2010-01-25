@@ -19,6 +19,8 @@ configure: configure-stamp
 configure-stamp: patch
 	dh_testdir
 	# Add here commands to configure the package.
+	aclocal
+	autoreconf -vfi
 	./configure --prefix=/usr --enable-calibrator
 	touch configure-stamp
 
