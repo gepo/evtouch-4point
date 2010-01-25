@@ -21,11 +21,21 @@
 # Process this file with autoconf to produce a configure script
 
 AC_PREREQ(2.59)
-AC_INIT([xf86-input-evtouch],[0.8.7],[http://www.conan.de/touchscreen/evtouch.html],[xf86-input-evtouch])
+AC_INIT([xf86-input-evtouch],
+        [0.8.7],
+        [http://www.conan.de/touchscreen/evtouch.html],
+        [xf86-input-evtouch])
+
+# Require xorg-macros version >= 1.3.0 for XORG_DEFAULT_OPTIONS
+m4_ifndef([XORG_MACROS_VERSION], [AC_FATAL([must install xorg-macros 1.3 or later before running autoconf/autogen])])
+XORG_MACROS_VERSION(1.1)
+XORG_DEFAULT_OPTIONS
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_AUX_DIR(.)
-AM_INIT_AUTOMAKE([dist-bzip2])
+AC_CANONICAL_HOST
+
+AM_INIT_AUTOMAKE([foreign dist-bzip2])
 
 AM_MAINTAINER_MODE
 
@@ -38,7 +48,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AC_PROG_CC
-AM_PROG_CC_C_O
+AC_PROG_CC_C99
 
 AH_TOP([#include "xorg-server.h"])
 
@@ -95,6 +105,9 @@ AC_SUBST([MKDIR_P])
 
 # Checks for header files.
 AC_HEADER_STDC
+
+XORG_WITH_LINT
+XORG_CHECK_LINUXDOC
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

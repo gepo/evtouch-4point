@@ -1,10 +1,11 @@
 
 #define _evdev_touch_C_
 
-#include <xf86Version.h>
-#if XF86_VERSION_CURRENT >= XF86_VERSION_NUMERIC(3,9,0,0,0)
-#define XFREE86_V4
-#endif
+#include "xorg-server.h"
+//#include <xf86Version.h>
+//#if XF86_VERSION_CURRENT >= XF86_VERSION_NUMERIC(3,9,0,0,0)
+//#define XFREE86_V4
+//#endif
 
 /*****************************************************************************
  *        Standard Headers
@@ -27,10 +28,10 @@
 #include "inputstr.h"
 #endif
 
-#include <xf86_OSproc.h>
 #include <xf86Xinput.h>
-#include <exevents.h>
+#include <xf86_OSproc.h>
 #include "xf86OSmouse.h"
+#include <exevents.h>
 
 #ifndef NEED_XF86_TYPES
 #define NEED_XF86_TYPES	/* for xisb.h when !XFree86LOADER */
@@ -67,7 +68,7 @@ static int debug_level = 0;
 static InputInfoPtr
 EVTouchPreInit(InputDriverPtr drv, IDevPtr dev, int flags);
 
-InputDriverRec EVTOUCH = {
+_X_EXPORT InputDriverRec EVTOUCH = {
         1,
         "evtouch",
         NULL,
@@ -78,14 +79,6 @@ InputDriverRec EVTOUCH = {
 };
 
 //#ifdef XFree86LOADER
-ModuleInfoRec EVTouchInfo = {
-        1,
-        "LBTOUCH",
-        NULL,
-        0,
-        NULL /*EVTouchAvailableOptions*/,
-};
-
 
 static XF86ModuleVersionInfo VersionRec =
 {
@@ -93,7 +86,7 @@ static XF86ModuleVersionInfo VersionRec =
         "Kenan Esau",
         MODINFOSTRING1,
         MODINFOSTRING2,
-        XF86_VERSION_CURRENT,
+        XORG_VERSION_CURRENT,
         0, 5, 1,
         ABI_CLASS_XINPUT,
         ABI_XINPUT_VERSION,
@@ -114,7 +107,7 @@ Plug( pointer module,
       int *errmaj,
       int *errmin )
 {
-        xf86AddModuleInfo(&EVTouchInfo, module);
+//        xf86AddModuleInfo(&EVTouchInfo, module);
         xf86AddInputDriver(&EVTOUCH, module, 0);
         return module;
 }
@@ -127,7 +120,11 @@ Unplug(pointer        p)
 }
 
 
-XF86ModuleData evtouchModuleData = {&VersionRec, Plug, Unplug };
+_X_EXPORT XF86ModuleData evtouchModuleData = {
+        &VersionRec, 
+        Plug, 
+        Unplug
+};
 
 //#endif /* XFree86LOADER */
 
@@ -254,7 +251,7 @@ EVTouchPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
         local->type_name = XI_TOUCHSCREEN;
         local->device_control = DeviceControl;
         local->read_input = ReadInput;
-        local->control_proc = NULL; /* ControlProc; */
+        local->control_proc = ControlProc;
         local->close_proc = CloseProc;
         local->switch_mode = SwitchMode;
         local->conversion_proc = ConvertProc;
@@ -692,6 +689,10 @@ DeviceInit (DeviceIntPtr dev)
         LocalDevicePtr local = (LocalDevicePtr) dev->public.devicePrivate;
         EVTouchPrivatePtr priv = (EVTouchPrivatePtr) (local->private);
         unsigned char map[] = {0, 1, 2, 3};
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+    Atom btn_labels[MSE_MAXBUTTONS] = {0};
+    Atom axes_labels[2] = { 0, 0 };
+#endif
 
    
         /* 
@@ -740,7 +741,34 @@ DeviceInit (DeviceIntPtr dev)
         /* 
          * Device reports button press for 3 buttons.
          */
-        if (InitButtonClassDeviceStruct (dev, 3, map) == FALSE)
+        /* FIXME: we should probably set the labels here */
+
+	InitPointerDeviceStruct((DevicePtr)dev, map,
+				3,
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+                                btn_labels,
+#endif
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) == 0
+				miPointerGetMotionEvents,
+#elif GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 3
+                                GetMotionHistory,
+#endif
+                                ControlProc,
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) == 0
+				miPointerGetMotionBufferSize()
+#else
+                                GetMotionHistorySize(), 2
+#endif
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+                                , axes_labels
+#endif
+                                );
+
+        if (InitButtonClassDeviceStruct (dev, 3, 
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+            btn_labels, 
+#endif
+            map) == FALSE)
         {
                 ErrorF("Unable to allocate EVTouch touchscreen ButtonClassDeviceStruct\n");
                 return !Success;
@@ -755,7 +783,12 @@ DeviceInit (DeviceIntPtr dev)
          * Device reports motions on 2 axes in absolute coordinates.
          * Axes min and max values are reported in raw coordinates.
          */
-        if (InitValuatorClassDeviceStruct(dev, 2, xf86GetMotionEvents,
+        if (InitValuatorClassDeviceStruct(dev, 2, 
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+                                          axes_labels,
+#else
+                                        xf86GetMotionEvents,
+#endif
                                           local->history_size, Absolute) == FALSE)
         {
                 ErrorF ("Unable to allocate EVTouch touchscreen ValuatorClassDeviceStruct\n");
@@ -763,11 +796,19 @@ DeviceInit (DeviceIntPtr dev)
         }
         else
         {
-                InitValuatorAxisStruct (dev, 0, priv->min_x, priv->max_x,
+                InitValuatorAxisStruct (dev, 0, 
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+                                        axes_labels[0], 
+#endif
+                                        priv->min_x, priv->max_x,
                                         1024,
                                         EV_AXIS_MIN_RES /* min_res */ ,
                                         EV_AXIS_MAX_RES /* max_res */ );
-                InitValuatorAxisStruct (dev, 1, priv->min_y, priv->max_y,
+                InitValuatorAxisStruct (dev, 1, 
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+                                        axes_labels[1], 
+#endif
+                                        priv->min_y, priv->max_y,
                                         1024,
                                         EV_AXIS_MIN_RES /* min_res */ ,
                                         EV_AXIS_MAX_RES /* max_res */ );
@@ -951,7 +992,7 @@ QueryHardware (LocalDevicePtr local)
 static void
 EVTouchNewPacket (EVTouchPrivatePtr priv)
 {
-        xf86memset(&priv->ev, 0, sizeof(struct input_event));
+        memset(&priv->ev, 0, sizeof(struct input_event));
         priv->packeti = 0;
         priv->binary_pkt = FALSE;
 }

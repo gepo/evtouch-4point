@@ -18,7 +18,9 @@
 #  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 #  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-EXTRA_DIST = calibrator.c evtouch.h make_distrib.sh \
+AM_CPPFLAGS = $(XORG_CFLAGS)
+
+EXTRA_DIST = calibrator.c evtouch.h xf86OSmouse.h make_distrib.sh \
 README.calibration 69-touchscreen.rules
 noinst_HEADERS = evtouch.h 
 
@@ -40,4 +42,4 @@ endif
 @DRIVER_NAME@_drv_la_CFLAGS = -DXINPUT @EVTOUCH_CFLAGS@
 @DRIVER_NAME@_drv_ladir = @inputdir@
 
-@DRIVER_NAME@_drv_la_SOURCES = @DRIVER_NAME@.c 
+@DRIVER_NAME@_drv_la_SOURCES = @DRIVER_NAME@.c xf86OSmouse.h 
