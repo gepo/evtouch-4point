@@ -50,3 +50,5 @@ KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0AFA", ATTRS{idProduct}=
 KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="LBPS/2 Fujitsu Lifebook TouchScreen", SYMLINK+="input/evtouch_event"
 # Elo Touchscreen
 KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="04e7", ATTRS{idProduct}=="0020", SYMLINK+="input/evtouch_event"
+# General Touch
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{idVendor}=="0dfc", ATTRS{idProduct}=="0001", SYMLINK+="input/evtouch_event"
