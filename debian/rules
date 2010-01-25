@@ -21,7 +21,7 @@ configure-stamp: patch
 	# Add here commands to configure the package.
 	aclocal
 	autoreconf -vfi
-	./configure --prefix=/usr --enable-calibrator
+	./configure --prefix=/usr --enable-calibrator --enable-udevinstall
 	touch configure-stamp
 
 build: build-stamp
