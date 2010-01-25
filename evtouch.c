@@ -786,7 +786,7 @@ DeviceInit (DeviceIntPtr dev)
         if (InitValuatorClassDeviceStruct(dev, 2, 
 #if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
                                           axes_labels,
-#else
+#elif GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 4
                                         xf86GetMotionEvents,
 #endif
                                           local->history_size, Absolute) == FALSE)
