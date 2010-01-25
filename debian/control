@@ -12,10 +12,19 @@ Homepage: http://stz-softwaretechnik.com/~ke/touchscreen/evtouch.html
 Package: xserver-xorg-input-evtouch
 Architecture: any
 Depends: ${shlibs:Depends}, ${xserver:Depends}
+Recommends: evtouch-calibrator
 Provides: ${xinpdriver:Provides}
 Description: Touchscreen-Driver for X.Org/XFree86 server
  This XFree/X.Org driver provides support for touchscreens input devices.
  The driver is actually an evdev-driver which supports events for moving
  in absolute coordinates, relative coordinates and mouse-buttons.
+ .
+
+Package: evtouch-calibrator
+Architecture: any
+Depends: xserver-xorg-input-evtouch, ${shlibs:Depends}, ${xserver:Depends}
+Recommends: xserver-xorg-input-evtouch
+Provides: ${xinpdriver:Provides}
+Description: 4-point calibrator for EVTouch device. 
  .
 
