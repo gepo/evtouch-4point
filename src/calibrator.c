@@ -1,3 +1,4 @@
+
 /*
  * simple and generic touchscreen calibration program using the linux 2.6
  * input event interface
@@ -387,6 +388,7 @@ void draw_graphics()
 
 			cx = (MARK_POINT[j] * width) / SCREEN_MAX;
 			cy = (MARK_POINT[i] * height) / SCREEN_MAX;
+            printf("drawed: x=%d,y=%d\n",cx,cy);
 			draw_point(cx, cy, width / 200, width / 64, color);
 		}
 	}
@@ -548,7 +550,9 @@ void sig_handler(int num)
 
 		points_x[points_touched] = x;
 		points_y[points_touched] = y;
-		
+	
+        printf("measured: x=%d,y=%d\n", x, y);
+
 		points_touched++;
 		draw_graphics();
 
@@ -570,7 +574,7 @@ void sig_handler(int num)
 		y_low = (points_y[0] + points_y[1]) / 2;
 		x_hi = (points_x[1] + points_x[3]) / 2;
 		y_hi = (points_y[2] + points_y[3]) / 2;
-
+printf("x_low=%d,y_low=%d,x_hi=%d,y_hi=%d\n", x_low, y_low, x_hi, y_hi);
 		/* see if one of the axes is inverted */
 		if (x_low > x_hi) {
 			int tmp = x_hi;
