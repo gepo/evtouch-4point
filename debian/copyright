@@ -1,11 +1,8 @@
-This package was debianized Mattia Dongili <malattia@debian.org> based on the work
-by Rex Tsai <chihchun@debian.org.tw> on Sun, 03 Dec 2006 18:53:48 +0100.
+This package was debianized Gennady Telegin <gt@neokiosk.ru>. 
 
-It was downloaded from http://www.stz-softwaretechnik.com/~ke/touchscreen/evtouch.html
+It was downloaded from http://gitorious.org/evtouch-4point
 
-Upstream Author:  Kenan Esau <kenan.esau@conan.de>
-
-Copyright: 2004-2006 Kenan Esau <kenan.esau@conan.de>, Baltmannsweiler, Germany.
+Copyright: 2009-2010 Gennady Telegin <gt@neokiosk.ru>, Moscow, Russia.
 
 License:
 
@@ -29,6 +26,6 @@ License:
  CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-The Debian packaging is (C) 2006, Mattia Dongili <malattia@debian.org> and
+The Debian packaging is (C) 2010, Gennady Telegin <gt@neokiosk.ru> and
 is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
 

@@ -3,9 +3,10 @@
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
-include debian/xsfbs/xsfbs.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/cmake.mk
 
-PACKAGE=xserver-xorg-input-evtouch
+PACKAGE=evtouch-calibrator
 
 CFLAGS = -Wall -g
 
@@ -15,69 +16,3 @@ else
 	CFLAGS += -O2
 endif
 
-configure: configure-stamp
-configure-stamp: patch
-	dh_testdir
-	# Add here commands to configure the package.
-	aclocal
-	autoreconf -vfi
-	./configure --prefix=/usr --enable-calibrator --enable-udevinstall
-	touch configure-stamp
-
-build: build-stamp
-
-build-stamp: configure-stamp 
-	dh_testdir
-
-	# Add here commands to compile the package.
-	$(MAKE) CFLAGS="$(CFLAGS)"
-	#docbook-to-man debian/evtouch.sgml > evtouch.1
-
-	touch $@
-
-clean: xsfclean clean-patched unpatch
-clean-patched:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	[ ! -f Makefile ] || $(MAKE) distclean
-
-	dh_clean 
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k 
-	dh_installdirs
-
-	# Add here commands to install the package into debian/tmp
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
-
-
-# Build architecture-independent files here.
-binary-indep: build install
-# We have nothing to do by default.
-
-# Build architecture-dependent files here.
-binary-arch: build install serverabi
-	dh_testdir
-	dh_testroot
-	dh_install --sourcedir=debian/tmp --list-missing --exclude=.la --exclude=.a
-	dh_installchangelogs ChangeLog
-	dh_installdocs 
-	dh_installexamples
-	dh_installman
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
