@@ -19,6 +19,9 @@
 #include <errno.h>
 #include <string.h>
 
+#include <dbus/dbus.h>
+#include <libhal.h>
+
 //#define DEBUG
 
 /*****************************************************************************/
