@@ -16,6 +16,10 @@
 #include <termios.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <errno.h>
+#include <string.h>
+
+//#define DEBUG
 
 /*****************************************************************************/
 /* stuff for event interface */
@@ -156,7 +160,9 @@ int get_events(int *px, int *py)
 				break;
 
 			default:
+#ifdef DEBUG
                 printf("Unknown ev.code=%d for ev.type=EV_ABS\n", ev.code);
+#endif
 				break;
 			}
 
@@ -170,7 +176,9 @@ int get_events(int *px, int *py)
                 break;
 
 			default:
+#ifdef DEBUG
                 printf("Unknown ev.code=%d for ev.type=EV_KEY\n", ev.code);
+#endif
 			    break;
 			}
 
@@ -180,13 +188,16 @@ int get_events(int *px, int *py)
 			if (ev.code == SYN_REPORT)
 				sync = 1;
             else
+#ifdef DEBUG
                 printf("Unknown ev.code=%d for ev.type=EV_SYN\n", ev.code);
-
+#endif
 
 			break;
 
 		default:
+#ifdef DEBUG
             printf("Unknown ev.type=EV_SYN\n", ev.type);
+#endif
 			break;
 		}
 	}
@@ -388,7 +399,11 @@ void draw_graphics()
 
 			cx = (MARK_POINT[j] * width) / SCREEN_MAX;
 			cy = (MARK_POINT[i] * height) / SCREEN_MAX;
+
+#ifdef DEBUG
             printf("drawed: x=%d,y=%d\n",cx,cy);
+#endif
+
 			draw_point(cx, cy, width / 200, width / 64, color);
 		}
 	}
@@ -551,7 +566,9 @@ void sig_handler(int num)
 		points_x[points_touched] = x;
 		points_y[points_touched] = y;
 	
+#ifdef DEBUG
         printf("measured: x=%d,y=%d\n", x, y);
+#endif
 
 		points_touched++;
 		draw_graphics();
@@ -574,7 +591,11 @@ void sig_handler(int num)
 		y_low = (points_y[0] + points_y[1]) / 2;
 		x_hi = (points_x[1] + points_x[3]) / 2;
 		y_hi = (points_y[2] + points_y[3]) / 2;
-printf("x_low=%d,y_low=%d,x_hi=%d,y_hi=%d\n", x_low, y_low, x_hi, y_hi);
+
+#ifdef DEBUG
+        printf("x_low=%d,y_low=%d,x_hi=%d,y_hi=%d\n", x_low, y_low, x_hi, y_hi);
+#endif
+
 		/* see if one of the axes is inverted */
 		if (x_low > x_hi) {
 			int tmp = x_hi;
@@ -633,7 +654,7 @@ int main(int argc, char *argv[], char *env[])
 
 	evfd = open(argv[1], O_RDONLY | O_NONBLOCK);
 	if (evfd == -1) {
-		fprintf(stderr, "Cannot open device file!\n");
+		fprintf(stderr, "Cannot open device file: %s\n", strerror(errno));
 		return 1;
 	}
 
