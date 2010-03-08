@@ -1,0 +1,26 @@
+== About ==
+This tool do 4 point calibration of evtouch device.
+Originally based on calibrator from http://linux.chapter7.ch/touchkit/.
+
+Features:
+ * Read events directly from device
+ * Don't require restart Xorg in special mode
+
+Supported hardware:
+ * GeneralTouch
+ * ATouch
+ * Digital Vision
+
+== Build ==
+
+=== With HAL ==
+mkdir build
+cd build
+cmake ..
+make
+
+== Without HAL ==
+mkdir build
+cd build
+cmake -DDISABLE_HAL ..
+make
