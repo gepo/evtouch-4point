@@ -630,10 +630,10 @@ void sig_handler(int num)
 
 #ifndef DISABLE_HAL
         if (use_hal) {
-            evtouch_set_property("MinX", x_inv ? x_max : x_min);
-            evtouch_set_property("MinY", y_inv ? y_min : y_max);
-            evtouch_set_property("MaxX", x_inv ? x_min : x_max);
-            evtouch_set_property("MaxY", y_inv ? y_max : y_min);
+            evtouch_set_property("MinX", x_min);
+            evtouch_set_property("MinY", y_min);
+            evtouch_set_property("MaxX", x_max);
+            evtouch_set_property("MaxY", y_max);
         }
 #endif
 
