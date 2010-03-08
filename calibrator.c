@@ -18,11 +18,12 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <string.h>
+#include <libgen.h>
 
 #include <dbus/dbus.h>
 #include <libhal.h>
 
-//#define DEBUG
+#include <getopt.h>
 
 /*****************************************************************************/
 /* stuff for event interface */
@@ -131,6 +132,8 @@ unsigned int width, height;	/* window size */
 char *progname;
 int evfd;
 
+int verbose_output = 0;
+int use_hal = 0;
 
 /*****************************************************************************/
 
@@ -163,9 +166,9 @@ int get_events(int *px, int *py)
 				break;
 
 			default:
-#ifdef DEBUG
-                printf("Unknown ev.code=%d for ev.type=EV_ABS\n", ev.code);
-#endif
+                if (verbose_output) {
+                    printf("Unknown ev.code=%d for ev.type=EV_ABS\n", ev.code);
+                }
 				break;
 			}
 
@@ -179,9 +182,9 @@ int get_events(int *px, int *py)
                 break;
 
 			default:
-#ifdef DEBUG
-                printf("Unknown ev.code=%d for ev.type=EV_KEY\n", ev.code);
-#endif
+                if (verbose_output) {
+                    printf("Unknown ev.code=%d for ev.type=EV_KEY\n", ev.code);
+                }
 			    break;
 			}
 
@@ -191,16 +194,16 @@ int get_events(int *px, int *py)
 			if (ev.code == SYN_REPORT)
 				sync = 1;
             else
-#ifdef DEBUG
-                printf("Unknown ev.code=%d for ev.type=EV_SYN\n", ev.code);
-#endif
+                if (verbose_output) {
+                    printf("Unknown ev.code=%d for ev.type=EV_SYN\n", ev.code);
+                }
 
 			break;
 
 		default:
-#ifdef DEBUG
-            printf("Unknown ev.type=EV_SYN\n", ev.type);
-#endif
+            if (verbose_output) {
+                printf("Unknown ev.type=EV_SYN\n", ev.type);
+            }
 			break;
 		}
 	}
@@ -403,9 +406,9 @@ void draw_graphics()
 			cx = (MARK_POINT[j] * width) / SCREEN_MAX;
 			cy = (MARK_POINT[i] * height) / SCREEN_MAX;
 
-#ifdef DEBUG
-            printf("drawed: x=%d,y=%d\n",cx,cy);
-#endif
+            if (verbose_output) {
+                printf("drawed: x=%d,y=%d\n",cx,cy);
+            }
 
 			draw_point(cx, cy, width / 200, width / 64, color);
 		}
@@ -569,9 +572,9 @@ void sig_handler(int num)
 		points_x[points_touched] = x;
 		points_y[points_touched] = y;
 	
-#ifdef DEBUG
-        printf("measured: x=%d,y=%d\n", x, y);
-#endif
+        if (verbose_output) {
+            printf("measured: x=%d,y=%d\n", x, y);
+        }
 
 		points_touched++;
 		draw_graphics();
@@ -595,9 +598,9 @@ void sig_handler(int num)
 		x_hi = (points_x[1] + points_x[3]) / 2;
 		y_hi = (points_y[2] + points_y[3]) / 2;
 
-#ifdef DEBUG
-        printf("x_low=%d,y_low=%d,x_hi=%d,y_hi=%d\n", x_low, y_low, x_hi, y_hi);
-#endif
+        if (verbose_output) {
+            printf("x_low=%d,y_low=%d,x_hi=%d,y_hi=%d\n", x_low, y_low, x_hi, y_hi);
+        }
 
 		/* see if one of the axes is inverted */
 		if (x_low > x_hi) {
@@ -643,24 +646,72 @@ void sig_handler(int num)
 	return;
 }
 
+void usage(char* programName)
+{
+    fprintf(stderr, "Usage: %s [OPTIONS] <device>\n\n", basename(programName));
+    fprintf(stderr, "OPTIONS:\n");
+    fprintf(stderr, "\t--hal      set calibration results to Xorg via hal\n");
+    fprintf(stderr, "\t--verbose  do output of debug data (into stdout)\n");
+    fprintf(stderr, "\t--help|h   show this help\n");
+}
 
 int main(int argc, char *argv[], char *env[])
 {
 	char *display_name = NULL;
 	XSetWindowAttributes xswa;
 
-	/* one arg: device name */
-	if (argc != 2) {
-		fprintf(stderr, "Usage %s <device>!\n", argv[0]);
-		return 1;
-	}
+    int help_flag = 0;
+    char* deviceName;
 
-	evfd = open(argv[1], O_RDONLY | O_NONBLOCK);
+    if (argc == 1) {
+        help_flag = 1;
+    } else {
+        /* parse arguments */
+        struct option long_options[] =
+        {
+            {"hal", no_argument, &use_hal, 1},
+            {"verbose", no_argument, &verbose_output, 1},
+            {"help", no_argument, &help_flag, 1},
+            {0, 0, 0, 0}
+        };
+
+        while (1) {
+            int option_index = 0;
+            int c = getopt_long(argc, argv, "h", long_options, &option_index);
+
+            if (c == -1)
+                break;
+
+            switch (c) {
+            case 0:
+                /* Nothing to do */
+                break;
+            case 'h':
+                help_flag = 1;
+                break;
+            default:
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    if (help_flag) {
+        usage(argv[0]);
+        return 0;
+    }
+
+    if (optind >= argc) {
+        fprintf(stderr, "Expected argument after options\n");
+        exit(EXIT_FAILURE);
+    }
+
+    deviceName = argv[optind];
+
+	evfd = open(deviceName, O_RDONLY | O_NONBLOCK);
 	if (evfd == -1) {
-		fprintf(stderr, "Cannot open device file: %s\n", strerror(errno));
+		fprintf(stderr, "Cannot open device file '%s': %s\n", deviceName, strerror(errno));
 		return 1;
 	}
-
 
 	/* connect to X server */
 	if ((display = XOpenDisplay(display_name)) == NULL) {
