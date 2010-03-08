@@ -612,36 +612,21 @@ void sig_handler(int num)
             printf("x_low=%d,y_low=%d,x_hi=%d,y_hi=%d\n", x_low, y_low, x_hi, y_hi);
         }
 
-		/* see if one of the axes is inverted */
-		if (x_low > x_hi) {
-			int tmp = x_hi;
-			x_hi = x_low;
-			x_low = tmp;
-			x_inv = 1;
-		}
-		if (y_low > y_hi) {
-			int tmp = y_hi;
-			y_hi = y_low;
-			y_low = tmp;
-			y_inv = 1;
-		}
-
-
 		/* calc the min and max values */
-		x_seg = (x_hi - x_low) / (SCREEN_DIVIDE - 2);
+		x_seg = abs(x_hi - x_low) / (SCREEN_DIVIDE - 2);
 		x_min = x_low - x_seg;
 		x_max = x_hi + x_seg;
 
-		y_seg = (y_hi - y_low) / (SCREEN_DIVIDE - 2);
+		y_seg = abs(y_hi - y_low) / (SCREEN_DIVIDE - 2);
 		y_min = y_low - y_seg;
 		y_max = y_hi + y_seg;
 
 		/* print it, hint: evtouch has Y inverted */
 		printf("Copy-Paste friendly, for evtouch XFree86 driver\n");
-		printf("	Option \"MinX\" \"%d\"\n", x_inv ? x_max : x_min);
-		printf("	Option \"MinY\" \"%d\"\n", y_inv ? y_min : y_max);
-		printf("	Option \"MaxX\" \"%d\"\n", x_inv ? x_min : x_max);
-		printf("	Option \"MaxY\" \"%d\"\n", y_inv ? y_max : y_min);
+		printf("	Option \"MinX\" \"%d\"\n", x_min);
+		printf("	Option \"MinY\" \"%d\"\n", y_min);
+		printf("	Option \"MaxX\" \"%d\"\n", x_max);
+		printf("	Option \"MaxY\" \"%d\"\n", y_max);
 
 #ifndef DISABLE_HAL
         if (use_hal) {
