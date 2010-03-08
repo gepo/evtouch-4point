@@ -18,11 +18,14 @@
           margin: 0 auto;
           width: 700px;
           background-color: white;
+          border-right: 2px solid black;
+          border-bottom: 2px solid black;
         }
         #header {
             background-color: #eee;
             border-bottom: 1px solid #aaa;
             padding-left: 10px;
+            margin-bottom: 10px;
         }
         #container {
           padding: 8px;
@@ -37,6 +40,9 @@
         }
         h3 { text-align: center; color: #82bfc7; }
         a { color: #333; }
+        a:hover {
+            text-decoration: none;
+        }
         .description { font-size: 0.9em; margin-top: 15px; font-style: italic;}
         .download { float: right; }
 		pre { 
@@ -45,11 +51,10 @@
             border: 1px solid #aaa;
             background: #eee;
         }
-        hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
         .footer { text-align:center; padding-top:30px; font-style: italic; }
 
         ul, p {
-            padding: 0 0 10px 10px;
+            padding: 0 0 0px 0px;
             line-height: 17px;
             font-family: verdana, arial, sans-serif;
             font-size: 0.7em;
@@ -77,16 +82,15 @@
   <div id="container">
 
     <p>
-Calibration tool do not require setting of special options in xorg.conf or starting Xorg in special mode.<br/>
+Calibration tool do not require setting of special options in xorg.conf or starting Xorg in special mode.</p>
 
-Based on <a href="http://linux.chapter7.ch/touchkit/">http://linux.chapter7.ch/touchkit/</a>.<br/>
-Supported hardware:
+<p>Based on <a href="http://linux.chapter7.ch/touchkit/">http://linux.chapter7.ch/touchkit/</a>.</p>
+<p>Supported hardware:</p>
 <ul>
 <li>GeneralTouch</li>
 <li>ATouch</li>
 <li>Digital Vision</li>
 </ul>
-</p>
 
     <h2>Download</h2>
     <p>
