@@ -20,8 +20,10 @@
 #include <string.h>
 #include <libgen.h>
 
+#ifndef DISABLE_HAL
 #include <dbus/dbus.h>
 #include <libhal.h>
+#endif
 
 #include <getopt.h>
 
@@ -133,7 +135,15 @@ char *progname;
 int evfd;
 
 int verbose_output = 0;
+
+#ifndef DISABLE_HAL
 int use_hal = 0;
+char* hal_udi = NULL;
+DBusError dbus_error;
+static LibHalContext *hal_ctx;
+
+void evtouch_set_property(char* key, int ivalue);
+#endif
 
 /*****************************************************************************/
 
@@ -633,6 +643,15 @@ void sig_handler(int num)
 		printf("	Option \"MaxX\" \"%d\"\n", x_inv ? x_min : x_max);
 		printf("	Option \"MaxY\" \"%d\"\n", y_inv ? y_max : y_min);
 
+#ifndef DISABLE_HAL
+        if (use_hal) {
+            evtouch_set_property("MinX", x_inv ? x_max : x_min);
+            evtouch_set_property("MinY", y_inv ? y_min : y_max);
+            evtouch_set_property("MaxX", x_inv ? x_min : x_max);
+            evtouch_set_property("MaxY", y_inv ? y_max : y_min);
+        }
+#endif
+
 		draw_message("   Done...   ");
 		XFlush(display);
 
@@ -650,10 +669,73 @@ void usage(char* programName)
 {
     fprintf(stderr, "Usage: %s [OPTIONS] <device>\n\n", basename(programName));
     fprintf(stderr, "OPTIONS:\n");
+#ifndef DISABLE_HAL
     fprintf(stderr, "\t--hal      set calibration results to Xorg via hal\n");
+#endif
     fprintf(stderr, "\t--verbose  do output of debug data (into stdout)\n");
     fprintf(stderr, "\t--help|h   show this help\n");
 }
+
+#ifndef DISABLE_HAL
+char* hal_find_by_property(char* key, char* value)
+{
+    int num_udis;
+    char** udis;
+    char* result;
+
+    udis = libhal_manager_find_device_string_match (hal_ctx, key, value, &num_udis, &dbus_error);
+
+    if (dbus_error_is_set (&dbus_error)) {
+        fprintf (stderr, "error: %s: %s\n", dbus_error.name, dbus_error.message);
+        dbus_error_free (&dbus_error);
+        return NULL;
+    }
+
+    if (verbose_output) {
+        fprintf (stderr, "Found %d device objects with string property %s = '%s'\n", num_udis, key, value);
+    }
+
+    if (num_udis == 0) {
+        return NULL;
+    }
+
+    if (num_udis > 1) {
+        //TODO: print device select menu
+    }
+
+    result = (char*)malloc(strlen(udis[0]) + 1);
+    strcpy(result, udis[0]);
+
+    libhal_free_string_array (udis);
+    free(value);
+
+    return result;
+}
+
+/*
+ * Set several options: MinX,MaxX, MinY, MaxY
+ *  for udi = hal_udi
+ */
+void evtouch_set_property(char* key, int ivalue)
+{
+    char* optionName = (char*)malloc(50);
+    dbus_bool_t rc = 0;
+    char* value = (char*)malloc(10);
+    sprintf(value, "%d", ivalue);
+
+    optionName = "input.x11_options.";
+    optionName = strcat(optionName, key);
+
+    rc = libhal_device_set_property_string (hal_ctx, hal_udi, optionName, value, &dbus_error);
+
+    free(optionName);
+
+    if (!rc) {
+        fprintf (stderr, "error: libhal_device_set_property: %s: %s\n", dbus_error.name, dbus_error.message);
+        dbus_error_free (&dbus_error);
+    }
+}
+#endif
 
 int main(int argc, char *argv[], char *env[])
 {
@@ -669,7 +751,9 @@ int main(int argc, char *argv[], char *env[])
         /* parse arguments */
         struct option long_options[] =
         {
+#ifndef DISABLE_HAL
             {"hal", no_argument, &use_hal, 1},
+#endif
             {"verbose", no_argument, &verbose_output, 1},
             {"help", no_argument, &help_flag, 1},
             {0, 0, 0, 0}
@@ -704,6 +788,39 @@ int main(int argc, char *argv[], char *env[])
         fprintf(stderr, "Expected argument after options\n");
         exit(EXIT_FAILURE);
     }
+
+#ifndef DISABLE_HAL
+    if (use_hal) {
+        dbus_error_init(&dbus_error);
+        if ((hal_ctx = libhal_ctx_new ()) == NULL) {
+            fprintf (stderr, "error: libhal_ctx_new\n");
+            return 1;
+        }
+
+        if (!libhal_ctx_set_dbus_connection (hal_ctx, dbus_bus_get (DBUS_BUS_SYSTEM, &dbus_error))) {
+            fprintf (stderr, "error: libhal_ctx_set_dbus_connection: %s: %s\n", dbus_error.name, dbus_error.message);
+            LIBHAL_FREE_DBUS_ERROR (&dbus_error);
+            return 1;
+        }
+
+        if (!libhal_ctx_init (hal_ctx, &dbus_error)) {
+            if (dbus_error_is_set(&dbus_error)) {
+                fprintf (stderr, "error: libhal_ctx_init: %s: %s\n", dbus_error.name, dbus_error.message);
+                dbus_error_free (&dbus_error);
+            }
+
+            fprintf (stderr, "Could not initialise connection to hald.\n"
+            "Normally this means the HAL daemon (hald) is not running or not ready.\n");
+            return 1;
+        }
+
+        hal_udi = hal_find_by_property("input.x11_driver", "evtouch");
+        if (hal_udi == NULL) {
+            fprintf (stderr, "couldn't find evtouch device via hal");
+            return 1;
+        }
+    }
+#endif
 
     deviceName = argv[optind];
 
