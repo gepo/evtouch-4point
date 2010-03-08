@@ -9,26 +9,55 @@
 	
 	<style type="text/css">
 		body {
-  		margin-top: 1.0em;
-  		background-color: #7d4038;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #ffffff;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #82bfc7; margin-bottom: 3px; }
+            margin-top: 1.0em;
+            background-color: #111;
+            font-family: serif;
+            color: #333;
+        }
+        #main {
+          margin: 0 auto;
+          width: 700px;
+          background-color: white;
+        }
+        #header {
+            background-color: #eee;
+            border-bottom: 1px solid #aaa;
+            padding-left: 10px;
+        }
+        #container {
+          padding: 8px;
+        }
+		h1 { font-size: 3.8em; color: #82bfc7; margin-bottom: 3px; font-family: georgia; }
 		h1 .small { font-size: 0.4em; }
 		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #82bfc7; }
-    h3 { text-align: center; color: #82bfc7; }
-    a { color: #82bfc7; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
+		h2 { 
+            border-bottom: 1px dotted #aaa;
+            margin-bottom: 10px;
+            margin-top: 15px;
+        }
+        h3 { text-align: center; color: #82bfc7; }
+        a { color: #333; }
+        .description { font-size: 0.9em; margin-top: 15px; font-style: italic;}
+        .download { float: right; }
+		pre { 
+            margin: 0 18px 10px 10px;
+            padding: 10px;
+            border: 1px solid #aaa;
+            background: #eee;
+        }
+        hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+        .footer { text-align:center; padding-top:30px; font-style: italic; }
+
+        ul, p {
+            padding: 0 0 10px 10px;
+            line-height: 17px;
+            font-family: verdana, arial, sans-serif;
+            font-size: 0.7em;
+        }
+        ul {
+            margin-left: 20px;
+        }
+
 	</style>
 	
 </head>
@@ -36,21 +65,16 @@
 <body>
   <a href="http://github.com/gepo/evtouch-4point"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
+  <div id="main">
+    <div id="header">
+        <h1><a href="http://github.com/gepo/evtouch-4point">EVTouch 4point</a></h1>
+
+        <div class="description">
+        EVTouch's 4 point calibrator for GNU/Linux
+        </div>
+    </div>
+
   <div id="container">
-
-    <div class="download">
-      <a href="http://github.com/gepo/evtouch-4point/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/gepo/evtouch-4point/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="http://github.com/gepo/evtouch-4point">evtouch-4point</a>
-      <span class="small">by <a href="http://github.com/gepo">gepo</a></span></h1>
-
-    <div class="description">
-      4 point calibration tool for evtouch touchscrens for GNU/Linux
-    </div>
 
     <p>
 Calibration tool do not require setting of special options in xorg.conf or starting Xorg in special mode.<br/>
@@ -62,8 +86,7 @@ Supported hardware:
 <li>ATouch</li>
 <li>Digital Vision</li>
 </ul>
-</p><h2>Authors</h2>
-<p>Gennady Telegin (gtelegin@gmail.com)<br/>      </p>
+</p>
 
     <h2>Download</h2>
     <p>
@@ -88,6 +111,7 @@ $ make
     </div>
 
   </div>
+</div>
 
   <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
